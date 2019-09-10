@@ -9,9 +9,11 @@ import (
 
 type UnpauseJobCommand struct {
 	Job flaghelpers.JobFlag `short:"j" long:"job" required:"true" value-name:"PIPELINE/JOB" description:"Name of a job to unpause"`
+	TeamFlag
 }
 
 func (command *UnpauseJobCommand) Execute(args []string) error {
+	pipelineName, jobName := command.Job.PipelineName, command.Job.JobName
 	target, err := rc.LoadTarget(Fly.Target, Fly.Verbose)
 	if err != nil {
 		return err
@@ -22,16 +24,20 @@ func (command *UnpauseJobCommand) Execute(args []string) error {
 		return err
 	}
 
-	found, err := target.Team().UnpauseJob(command.Job.PipelineName, command.Job.JobName)
+	team := command.TeamFlag.GetTeamTarget(target)
+	found, err := team.UnpauseJob(pipelineName, jobName)
 	if err != nil {
 		return err
 	}
 
 	if !found {
-		return fmt.Errorf("%s/%s not found\n", command.Job.PipelineName, command.Job.JobName)
+		if command.Team == "" {
+			fmt.Println("hint: are you missing '--team' to specify the team for the build?")
+		}
+		return fmt.Errorf("%s/%s not found\n", pipelineName, jobName)
 	}
 
-	fmt.Printf("unpaused '%s'\n", command.Job.JobName)
+	fmt.Printf("unpaused '%s'\n", jobName)
 
 	return nil
 }
