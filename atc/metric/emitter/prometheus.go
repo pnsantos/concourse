@@ -392,6 +392,8 @@ func (emitter *PrometheusEmitter) Emit(logger lager.Logger, event metric.Event) 
 		emitter.databaseMetrics(logger, event)
 	case "resource checked":
 		emitter.resourceMetric(logger, event)
+	case "check finished":
+		emitter.checkMetric(logger, event)
 	default:
 		// unless we have a specific metric, we do nothing
 	}
@@ -689,6 +691,21 @@ func (emitter *PrometheusEmitter) resourceMetric(logger lager.Logger, event metr
 	}
 
 	emitter.resourceChecksVec.WithLabelValues(team, pipeline).Inc()
+}
+
+func (emitter *PrometheusEmitter) checkMetric(logger lager.Logger, event metric.Event) {
+	scopeID, exists := event.Attributes["scope_id"]
+	if !exists {
+		logger.Error("failed-to-find-resource-config-scope-id-in-event", fmt.Errorf("expected scope_id to exist in event.Attributes"))
+		return
+	}
+	checkName, exists := event.Attributes["check_name"]
+	if !exists {
+		logger.Error("failed-to-find-check-name-in-event", fmt.Errorf("expected check_name to exist in event.Attributes"))
+		return
+	}
+
+	emitter.resourceChecksVec.WithLabelValues(scopeID, checkName).Inc()
 }
 
 // updateLastSeen tracks for each worker when it last received a metric event.
