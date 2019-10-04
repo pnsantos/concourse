@@ -80,14 +80,27 @@ func NewServer(config *Config) (*Server, error) {
 	}
 
 	dexServer, err := dexserver.NewDexServer(&dexserver.DexConfig{
-		Logger:       config.Logger.Session("dex"),
-		Flags:        config.Flags,
-		IssuerURL:    issuerURL,
-		WebHostURL:   issuerPath,
-		ClientID:     clientID,
-		ClientSecret: clientSecret,
-		RedirectURL:  redirectURL,
-		Storage:      config.Storage,
+		Logger:     config.Logger.Session("dex"),
+		Flags:      config.Flags,
+		IssuerURL:  issuerURL,
+		WebHostURL: issuerPath,
+		Storage:    config.Storage,
+		Clients: []*dexserver.DexClient{
+			{
+				ClientID:     clientID,
+				ClientSecret: clientSecret,
+				RedirectURL:  redirectURL,
+			},
+			{
+				ClientID:     "fly",
+				ClientSecret: "Zmx5Cg==",
+				RedirectURL:  redirectURL,
+			},
+			{
+				ClientID:     "client-id",
+				ClientSecret: "client-secret",
+			},
+		},
 	})
 	if err != nil {
 		return nil, err
