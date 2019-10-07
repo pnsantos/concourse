@@ -26,3 +26,7 @@
 #### <sub><sup><a name="4507" href="#4507">:link:</a></sup></sub> fix
 
 * @iamjarvo fixed a [bug](444://github.com/concourse/concourse/issues/4472) where `fly builds` would show the wrong duration for cancelled builds #4507.
+
+#### <sub><sup><a name="3600" href="#3600">:link:</a></sup></sub> feature
+
+* Concourse now garbage-collects worker containers and volumes that are not tracked in the database. In some niche cases, it is possible for containers and/or volumes to be created on the worker, but the database assumes their creation had failed. If this occurs, these untracked containers can pile up on the worker and use resources. #3600 ensures that they get cleaned appropriately.
