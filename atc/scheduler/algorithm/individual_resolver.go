@@ -1,6 +1,10 @@
 package algorithm
 
 import (
+	"fmt"
+	"log"
+	"strings"
+
 	"github.com/concourse/concourse/atc/db"
 )
 
@@ -90,12 +94,12 @@ func (d *debugger) reset(depth int, inputName string) {
 }
 
 func (d *debugger) log(messages ...interface{}) {
-	// log.Println(
-	// 	append(
-	// 		[]interface{}{
-	// 			strings.Repeat("-", d.depth) + fmt.Sprintf("[%s]", d.inputName),
-	// 		},
-	// 		messages...,
-	// 	)...,
-	// )
+	log.Println(
+		append(
+			[]interface{}{
+				strings.Repeat("-", d.depth) + fmt.Sprintf("[%s]", d.inputName),
+			},
+			messages...,
+		)...,
+	)
 }
